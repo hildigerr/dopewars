@@ -27,6 +27,7 @@
 #endif
 
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -2395,12 +2396,20 @@ gchar *GetLocalConfigFile(void)
   if (!xdg_config_home) {
     home = getenv("HOME");
     if (home) {
-      xdg_config_home = g_strdup_printf("%s/.config", home);
-      conf = g_strdup_printf("%s/.dopewars", xdg_config_home);
-      g_free(xdg_config_home);
+      xdg_config_home = g_strdup_printf("%s/.config/dopewars", home);
     }
   } else {
-    conf = g_strdup_printf("%s/.dopewars", xdg_config_home);
+    xdg_config_home = g_strdup_printf("%s/dopewars", xdg_config_home);
+  }
+
+  /* Ensure user's config directory contains dopewars subdirectory */
+  if (xdg_config_home) {
+    struct stat sb;
+    if ((stat(xdg_config_home, &sb) == 0 && S_ISDIR(sb.st_mode))
+    ||(mkdir(xdg_config_home, S_IRWXU | S_IRGRP |S_IXGRP) == 0)) {
+      conf = g_strdup_printf("%s/.dopewars", xdg_config_home);
+    }
+    g_free(xdg_config_home);
   }
   return conf;
 #endif
