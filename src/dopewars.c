@@ -2390,8 +2390,12 @@ gchar *GetLocalConfigFile(void)
 #else
   gchar *home, *conf = NULL;
 
+  /* Local config is in the user's config directory */
+  home = getenv("XDG_CONFIG_HOME");
+  if (!home) {
   /* Local config is in the user's home directory */
-  home = getenv("HOME");
+    home = getenv("HOME");
+  }
   if (home) {
     conf = g_strdup_printf("%s/.dopewars", home);
   }
