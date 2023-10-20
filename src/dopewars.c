@@ -2391,13 +2391,16 @@ gchar *GetLocalConfigFile(void)
   gchar *home, *conf = NULL;
 
   /* Local config is in the user's config directory */
-  home = getenv("XDG_CONFIG_HOME");
-  if (!home) {
-  /* Local config is in the user's home directory */
+  gchar *xdg_config_home = getenv("XDG_CONFIG_HOME");
+  if (!xdg_config_home) {
     home = getenv("HOME");
-  }
-  if (home) {
-    conf = g_strdup_printf("%s/.dopewars", home);
+    if (home) {
+      xdg_config_home = g_strdup_printf("%s/.config", home);
+      conf = g_strdup_printf("%s/.dopewars", xdg_config_home);
+      g_free(xdg_config_home);
+    }
+  } else {
+    conf = g_strdup_printf("%s/.dopewars", xdg_config_home);
   }
   return conf;
 #endif
